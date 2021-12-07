@@ -30,4 +30,9 @@ export class PlacesService {
     return [...this._places]
   }
 
+  getPlace(id:string) {
+    // ... extracts all properties of the object
+    return {...this._places.find(place => place.id === id)}
+  }
+
 }

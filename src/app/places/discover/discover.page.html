@@ -1,5 +1,12 @@
 <ion-header>
   <ion-toolbar>
+    <ion-buttons slot="start">
+      <!-- ion-menu button opens the page automatically-->
+      <ion-menu-button></ion-menu-button>
+      <!-- by using ion  button we can programattically set the navigation -->
+      <!-- <ion-button (click)="onOpenMenu()">Open</ion-button> -->
+
+    </ion-buttons>
     <ion-title>Discover Places</ion-title>
   </ion-toolbar>
 </ion-header>
@@ -24,7 +31,7 @@
             <ion-button
               fill="clear"
               color="primary"
-              [routerLink]="['/','places','discover','loadedPlaces[0].id']"
+              [routerLink]="['/','places','discover',loadedPlaces[0].id]"
             >
               More</ion-button
             >
@@ -37,7 +44,7 @@
         <ion-list>
           <ion-item
             *ngFor="let place of loadedPlaces.slice(1)"
-            [routerLink]="['/', 'places','discover','place.id']"
+            [routerLink]="['/', 'places','discover',place.id]"
             detail
           >
             <ion-thumbnail slot="start">
