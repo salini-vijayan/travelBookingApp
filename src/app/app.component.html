@@ -1,6 +1,6 @@
 <ion-app>
   <!-- if we have multiple menus we can specify menus by using menuId="menuid" -->
-  <ion-menu side="start">
+  <ion-menu side="start" contentId="main">
     <ion-header>
       <ion-toolbar>
         <ion-title>PairBnB</ion-title>
@@ -34,5 +34,5 @@
     </ion-content>
   </ion-menu>
   <!-- menu will look for main to toggle the route -->
-  <ion-router-outlet main></ion-router-outlet>
+  <ion-router-outlet id="main"></ion-router-outlet>
 </ion-app>

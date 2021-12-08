@@ -1,6 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ModalController, NavController } from '@ionic/angular';
+import {
+  ActionSheetController,
+  ModalController,
+  NavController,
+} from '@ionic/angular';
 import { CreateBookingComponent } from 'src/app/booking/create-booking/create-booking.component';
 import { Place } from '../../places.model';
 import { PlacesService } from '../../places.service';
@@ -17,7 +21,8 @@ export class PlaceDetailPage implements OnInit {
     private route: ActivatedRoute,
     private navCtrl: NavController,
     private placeService: PlacesService,
-    private modalCtrl: ModalController
+    private modalCtrl: ModalController,
+    private actionSheetCtrl: ActionSheetController
   ) {}
 
   ngOnInit() {
@@ -44,21 +49,50 @@ export class PlaceDetailPage implements OnInit {
     // this.navCtrl.navigateBack('/places/discover');
     // this.navCtrl.pop()
 
-    // open modal
+    this.actionSheetCtrl
+      .create({
+        header: 'Choose an Action',
+        buttons: [
+          {
+            text: 'Select Date',
+            handler: () => {
+              this.openBookingModal('select');
+            },
+          },
+          {
+            text: 'Random Date',
+            handler: () => {
+              this.openBookingModal('random');
+            },
+          },
+          {
+            text: 'Cancel',
+            role: 'cancel',
+          },
+        ],
+      })
+      .then((actionSheetEl) => {
+        actionSheetEl.present();
+      });
+  }
+
+  // open modal
+  openBookingModal(mode: 'select' | 'random') {
     this.modalCtrl
-      .create({ // creates the modal
+      .create({
+        // creates the modal
         component: CreateBookingComponent,
         componentProps: { selectedPlace: this.place },
       })
-      .then(modalElmt => {
+      .then((modalElmt) => {
         modalElmt.present(); // opens the modal
-         // eventListener when modal ge dismissed);
+        // eventListener when modal ge dismissed);
         return modalElmt.onDidDismiss();
-      }).then(resultData => {
-        if(resultData.role === 'confirm') {
+      })
+      .then((resultData) => {
+        if (resultData.role === 'confirm') {
           // console.log('Booked!')
         }
       });
-
   }
 }
