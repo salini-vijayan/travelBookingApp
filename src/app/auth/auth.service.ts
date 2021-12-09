@@ -4,7 +4,8 @@ import { Injectable } from '@angular/core';
   providedIn: 'root',
 })
 export class AuthService {
-  private _userIsAuthenticated: boolean = false;
+  private _userIsAuthenticated: boolean = true;
+  private _userId: string = 'abc';
 
   // this getter function is to simply wrap the variable
   //  so that we can't set this directly from outside
@@ -12,6 +13,10 @@ export class AuthService {
   // instead use logib or logout method
   get userIsAuthenticated() {
     return this._userIsAuthenticated;
+  }
+
+  get userId(){
+    return this._userId;
   }
 
   constructor() {}

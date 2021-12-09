@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   ActionSheetController,
   ModalController,
   NavController,
 } from '@ionic/angular';
+import { Subscription } from 'rxjs';
 import { CreateBookingComponent } from 'src/app/booking/create-booking/create-booking.component';
 import { Place } from '../../places.model';
 import { PlacesService } from '../../places.service';
@@ -14,8 +15,9 @@ import { PlacesService } from '../../places.service';
   templateUrl: './place-detail.page.html',
   styleUrls: ['./place-detail.page.scss'],
 })
-export class PlaceDetailPage implements OnInit {
+export class PlaceDetailPage implements OnInit,OnDestroy {
   place: Place;
+  private placeSub: Subscription;
 
   constructor(
     private route: ActivatedRoute,
@@ -31,7 +33,10 @@ export class PlaceDetailPage implements OnInit {
         this.navCtrl.navigateBack('/places/discover');
         return;
       }
-      this.place = this.placeService.getPlace(params.get('placeId'));
+      this.placeSub = this.placeService.getPlace(params.get('placeId'))
+      .subscribe((places) => {
+        this.place = places;
+      });
     });
   }
 
@@ -82,7 +87,7 @@ export class PlaceDetailPage implements OnInit {
       .create({
         // creates the modal
         component: CreateBookingComponent,
-        componentProps: { selectedPlace: this.place },
+        componentProps: { selectedPlace: this.place, selectedMode: mode },
       })
       .then((modalElmt) => {
         modalElmt.present(); // opens the modal
@@ -91,8 +96,13 @@ export class PlaceDetailPage implements OnInit {
       })
       .then((resultData) => {
         if (resultData.role === 'confirm') {
-          // console.log('Booked!')
         }
       });
+  }
+
+  ngOnDestroy(): void {
+      if (this.placeSub) {
+        this.placeSub.unsubscribe();
+      }
   }
 }

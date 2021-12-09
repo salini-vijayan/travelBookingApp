@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
 import { AuthService } from './auth.service';
@@ -10,6 +11,7 @@ import { AuthService } from './auth.service';
 })
 export class AuthPage implements OnInit {
   isLoading: Boolean = false;
+  isLogin: Boolean = true;
 
   constructor(
     private authService: AuthService,
@@ -32,5 +34,18 @@ export class AuthPage implements OnInit {
         this.router.navigateByUrl('/places/discover');
       }, 1500);
     });
+  }
+
+  onSwitchAuthMode() {
+    this.isLogin = !this.isLogin;
+  }
+
+  OnSubmit(form: NgForm) {
+    if(!form.valid) {
+      return;
+    }
+    const email = form.value.email;
+    const password = form.value.password;
+    console.log(email,password)
   }
 }

@@ -1,4 +1,5 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { NgForm } from '@angular/forms';
 import { ModalController } from '@ionic/angular';
 import { Place } from 'src/app/places/places.model';
 
@@ -8,22 +9,55 @@ import { Place } from 'src/app/places/places.model';
   styleUrls: ['./create-booking.component.scss'],
 })
 export class CreateBookingComponent implements OnInit {
-
   @Input() selectedPlace: Place;
+  @Input() selectedMode: 'select' | 'random';
+  @ViewChild('form',{static: true}) form: NgForm;
+  startDate: string;
+  endDate: string;
 
-  constructor(private modalCtrl: ModalController) { }
+  constructor(private modalCtrl: ModalController) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    const availableFrom = new Date(this.selectedPlace.availableFromDate);
+    const availableTo = new Date(this.selectedPlace.availableToDate);
+    if (this.selectedMode === 'random') {
+      this.startDate = new Date(
+        availableFrom.getTime() +
+          Math.random() *
+            (availableTo.getTime() -
+              7 * 24 * 60 * 60 * 1000 -
+              availableFrom.getTime())
+      ).toISOString();
+      this.endDate = new Date(
+        new Date(this.startDate).getTime() +
+        Math.random() *
+        (new Date(this.startDate).getTime() +
+          6 * 24 * 60 * 60 * 1000 -
+          new Date(this.startDate).getTime())).toISOString();
+    }
+  }
 
-  OnPlaceBook(){
-    this.modalCtrl.dismiss({
-      message: 'Booked!'
+  OnBookPlace(){
+    if(!this.form.valid || !this.datesValid()) {
+      return;
+    }
+    this.modalCtrl.dismiss( { bookingData:{
+      firstName: this.form.value['first-name'],
+      lastName: this.form.value['last-name'],
+      guestNumber: this.form.value['guest-number'],
+      fromDate: this.form.value['date-from'],
+      toDate: this.form.value['date-to']}
     },'confirm')
   }
 
-  OnCancel(){
+  OnCancel() {
     // we can also specify the id of modal
-    this.modalCtrl.dismiss(null, 'cancel')
+    this.modalCtrl.dismiss(null, 'cancel');
   }
 
+  datesValid() {
+    const startDate = new Date(this.form.value['date-from']);
+    const endDate = new Date(this.form.value['date-to']);
+    return endDate > startDate
+  }
 }
