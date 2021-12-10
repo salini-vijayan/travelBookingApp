@@ -2,10 +2,14 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   ActionSheetController,
+  AlertController,
+  LoadingController,
   ModalController,
   NavController,
 } from '@ionic/angular';
 import { Subscription } from 'rxjs';
+import { AuthService } from 'src/app/auth/auth.service';
+import { BookingService } from 'src/app/booking/booking.service';
 import { CreateBookingComponent } from 'src/app/booking/create-booking/create-booking.component';
 import { Place } from '../../places.model';
 import { PlacesService } from '../../places.service';
@@ -15,29 +19,56 @@ import { PlacesService } from '../../places.service';
   templateUrl: './place-detail.page.html',
   styleUrls: ['./place-detail.page.scss'],
 })
-export class PlaceDetailPage implements OnInit,OnDestroy {
+export class PlaceDetailPage implements OnInit, OnDestroy {
   place: Place;
+  isBookable: Boolean = false;
+  isLoading: Boolean = false;
   private placeSub: Subscription;
 
   constructor(
+    private router: Router,
     private route: ActivatedRoute,
     private navCtrl: NavController,
     private placeService: PlacesService,
     private modalCtrl: ModalController,
-    private actionSheetCtrl: ActionSheetController
+    private actionSheetCtrl: ActionSheetController,
+    private bookingService: BookingService,
+    private loadingCtrl: LoadingController,
+    private authService: AuthService,
+    private alertCtl: AlertController
   ) {}
 
   ngOnInit() {
-    this.route.paramMap.subscribe((params) => {
-      if (!params.has('placeId')) {
-        this.navCtrl.navigateBack('/places/discover');
-        return;
+    this.route.paramMap.subscribe(
+      (params) => {
+        if (!params.has('placeId')) {
+          this.navCtrl.navigateBack('/places/discover');
+          return;
+        }
+        this.isLoading = true;
+        this.placeSub = this.placeService
+          .getPlace(params.get('placeId'))
+          .subscribe((places) => {
+            this.isLoading = false;
+            this.place = places;
+            this.isBookable = places.userId !== this.authService.userId;
+          });
+      },
+      (error) => {
+        this.alertCtl.create({
+          header: 'An error occured',
+          message: 'Could not load the place',
+          buttons: [
+            {
+              text: 'Okay',
+              handler: () => {
+                this.router.navigateByUrl('/places/discover');
+              },
+            },
+          ],
+        }).then (alertEl => alertEl.present());
       }
-      this.placeSub = this.placeService.getPlace(params.get('placeId'))
-      .subscribe((places) => {
-        this.place = places;
-      });
-    });
+    );
   }
 
   OnBookPlace() {
@@ -96,13 +127,35 @@ export class PlaceDetailPage implements OnInit,OnDestroy {
       })
       .then((resultData) => {
         if (resultData.role === 'confirm') {
+          this.loadingCtrl
+            .create({
+              message: 'Booking Place ...',
+            })
+            .then((loadingEl) => {
+              loadingEl.present();
+              const data = resultData.data.bookingData;
+              this.bookingService
+                .addBooking(
+                  this.place.id,
+                  this.place.title,
+                  this.place.imageUrl,
+                  data.firstName,
+                  data.lastName,
+                  data.guestNumber,
+                  data.fromDate,
+                  data.toDate
+                )
+                .subscribe(() => {
+                  loadingEl.dismiss();
+                });
+            });
         }
       });
   }
 
   ngOnDestroy(): void {
-      if (this.placeSub) {
-        this.placeSub.unsubscribe();
-      }
+    if (this.placeSub) {
+      this.placeSub.unsubscribe();
+    }
   }
 }

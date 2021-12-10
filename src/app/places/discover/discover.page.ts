@@ -15,6 +15,7 @@ export class DiscoverPage implements OnInit, OnDestroy {
   loadedPlaces: Place[];
   listloadedPlace: Place[];
   relevantPlaces: Place[];
+  isLoading:Boolean = false;
   checkedValue: string = 'all';
   private placesSub: Subscription;
 
@@ -29,7 +30,13 @@ export class DiscoverPage implements OnInit, OnDestroy {
       this.loadedPlaces = places;
       this.relevantPlaces = this.loadedPlaces;
       this.listloadedPlace = this.relevantPlaces.slice(1);
-      this.OnFilterUpdate(this.checkedValue);
+    });
+  }
+
+  ionViewWillEnter(){
+    this.isLoading = true;
+    this.placeService.fetchPlaces().subscribe(() => {
+      this.isLoading = false;
     });
   }
 
@@ -40,9 +47,9 @@ export class DiscoverPage implements OnInit, OnDestroy {
   //   this.menuCtrl.close() //to close the menu
   // }
 
-  OnFilterUpdate(filter:string) {
-    // const customEvent = event as CustomEvent<SegmentChangeEventDetail>;
-    this.checkedValue = filter;
+  OnFilterUpdate(event:Event) {
+    const customEvent = event as CustomEvent<SegmentChangeEventDetail>;
+    this.checkedValue = customEvent.detail.value;
     if (this.checkedValue == 'all') {
       this.relevantPlaces = this.loadedPlaces;
       this.listloadedPlace = this.relevantPlaces.slice(1);

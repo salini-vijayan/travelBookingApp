@@ -11,7 +11,7 @@ import { PlacesService } from '../places.service';
   styleUrls: ['./offers.page.scss'],
 })
 export class OffersPage implements OnInit, OnDestroy {
-
+  isLoading:Boolean = false;
   offerPlaces : Place[];
   private placesSub: Subscription;
 
@@ -22,6 +22,13 @@ export class OffersPage implements OnInit, OnDestroy {
     this.placesSub = this.placeService.places.subscribe(places => {
       this.offerPlaces = places;
     });
+  }
+
+  ionViewWillEnter(){
+    this.isLoading = true;
+    this.placeService.fetchPlaces().subscribe(()=>{
+      this.isLoading = false;
+    })
   }
 
   onEditOffer(id:string, slidingItem:IonItemSliding){
