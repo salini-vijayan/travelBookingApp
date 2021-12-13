@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
+import { PlaceLocation } from '../../location.models';
 import { PlacesService } from '../../places.service';
 
 @Component({
@@ -11,7 +12,6 @@ import { PlacesService } from '../../places.service';
 })
 export class NewOfferPage implements OnInit {
   offerForm: FormGroup;
-
   constructor(
     private placeService: PlacesService,
     private router: Router,
@@ -40,6 +40,10 @@ export class NewOfferPage implements OnInit {
         updateOn: 'blur',
         validators: [Validators.required],
       }),
+      location: new FormControl(null, {
+        updateOn: 'blur',
+        validators: [Validators.required],
+      }),
     });
   }
 
@@ -59,7 +63,8 @@ export class NewOfferPage implements OnInit {
             this.offerForm.value.description,
             +this.offerForm.value.price,
             this.offerForm.value.dateFrom,
-            this.offerForm.value.dateTo
+            this.offerForm.value.dateTo,
+            this.offerForm.value.location
           )
           .subscribe(() => {
             loadingEl.dismiss();
@@ -67,5 +72,14 @@ export class NewOfferPage implements OnInit {
             this.router.navigateByUrl('/places/offers');
           });
       });
+  }
+
+  OnLocationPicked(location: PlaceLocation) {
+    if(!location) {
+      return null;
+    }
+    this.offerForm.patchValue({
+      location:location
+    })
   }
 }

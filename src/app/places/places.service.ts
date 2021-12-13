@@ -4,6 +4,7 @@ import { BehaviorSubject, of } from 'rxjs';
 import { take, map, tap, delay, switchMap } from 'rxjs/operators';
 
 import { AuthService } from '../auth/auth.service';
+import { PlaceLocation } from './location.models';
 import { Place } from './places.model';
 
 
@@ -15,6 +16,7 @@ interface PlaceData {
   price: number;
   title: string;
   userId: string;
+  location: PlaceLocation
 }
 
 @Injectable({
@@ -44,7 +46,8 @@ export class PlacesService {
             placeData.price,
             new Date(placeData.availableFromDate),
             new Date(placeData.availableToDate),
-            placeData.userId
+            placeData.userId,
+            placeData.location
           );
         })
       );
@@ -69,7 +72,8 @@ export class PlacesService {
                   resData[key].price,
                   new Date(resData[key].availableFromDate),
                   new Date(resData[key].availableToDate),
-                  resData[key].userId
+                  resData[key].userId,
+                  resData[key].location
                 )
               );
             }
@@ -87,7 +91,8 @@ export class PlacesService {
     description: string,
     price: number,
     dateFrom: Date,
-    dateTo: Date
+    dateTo: Date,
+    location: PlaceLocation
   ) {
     let generatedId;
     const newPlace = new Place(
@@ -98,7 +103,8 @@ export class PlacesService {
       price,
       dateFrom,
       dateTo,
-      this.authService.userId
+      this.authService.userId,
+      location
     );
     return this.http
       .post<{ name: string }>(
@@ -155,7 +161,8 @@ export class PlacesService {
           oldPlaces.price,
           oldPlaces.availableFromDate,
           oldPlaces.availableToDate,
-          oldPlaces.userId
+          oldPlaces.userId,
+          oldPlaces.location
         );
         return this.http.put(
           `https://ionic-angular-49c28-default-rtdb.firebaseio.com/offeredPlace/${id}.json`,

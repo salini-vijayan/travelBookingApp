@@ -11,6 +11,7 @@ import { Subscription } from 'rxjs';
 import { AuthService } from 'src/app/auth/auth.service';
 import { BookingService } from 'src/app/booking/booking.service';
 import { CreateBookingComponent } from 'src/app/booking/create-booking/create-booking.component';
+import { MapModalComponent } from 'src/app/shared/map-modal/map-modal.component';
 import { Place } from '../../places.model';
 import { PlacesService } from '../../places.service';
 
@@ -55,18 +56,20 @@ export class PlaceDetailPage implements OnInit, OnDestroy {
           });
       },
       (error) => {
-        this.alertCtl.create({
-          header: 'An error occured',
-          message: 'Could not load the place',
-          buttons: [
-            {
-              text: 'Okay',
-              handler: () => {
-                this.router.navigateByUrl('/places/discover');
+        this.alertCtl
+          .create({
+            header: 'An error occured',
+            message: 'Could not load the place',
+            buttons: [
+              {
+                text: 'Okay',
+                handler: () => {
+                  this.router.navigateByUrl('/places/discover');
+                },
               },
-            },
-          ],
-        }).then (alertEl => alertEl.present());
+            ],
+          })
+          .then((alertEl) => alertEl.present());
       }
     );
   }
@@ -150,6 +153,25 @@ export class PlaceDetailPage implements OnInit, OnDestroy {
                 });
             });
         }
+      });
+  }
+
+  OnShowFullMap() {
+    this.modalCtrl
+      .create({
+        component: MapModalComponent,
+        componentProps: {
+          center: {
+            lat: this.place.location.lat,
+            lng: this.place.location.lng,
+          },
+          selectable: false,
+          closeButtonText: 'Close',
+          title: this.place.location.address,
+        },
+      })
+      .then((modalEl) => {
+        modalEl.present();
       });
   }
 

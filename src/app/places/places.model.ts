@@ -1,3 +1,5 @@
+import { PlaceLocation } from "./location.models";
+
 export class Place {
   constructor (
     public id :string,
@@ -7,6 +9,7 @@ export class Place {
     public price :number,
     public availableFromDate: Date,
     public availableToDate: Date,
-    public userId : string
+    public userId : string,
+    public location: PlaceLocation
   ) {}
 }
