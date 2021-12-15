@@ -10,6 +10,7 @@ export class Place {
     public availableFromDate: Date,
     public availableToDate: Date,
     public userId : string,
-    public location: PlaceLocation
+    public location: PlaceLocation,
+    public image: string
   ) {}
 }

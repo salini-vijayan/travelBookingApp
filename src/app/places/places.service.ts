@@ -16,7 +16,8 @@ interface PlaceData {
   price: number;
   title: string;
   userId: string;
-  location: PlaceLocation
+  location: PlaceLocation,
+  image: string
 }
 
 @Injectable({
@@ -47,7 +48,8 @@ export class PlacesService {
             new Date(placeData.availableFromDate),
             new Date(placeData.availableToDate),
             placeData.userId,
-            placeData.location
+            placeData.location,
+            placeData.image,
           );
         })
       );
@@ -73,7 +75,8 @@ export class PlacesService {
                   new Date(resData[key].availableFromDate),
                   new Date(resData[key].availableToDate),
                   resData[key].userId,
-                  resData[key].location
+                  resData[key].location,
+                  resData[key].image
                 )
               );
             }
@@ -92,7 +95,8 @@ export class PlacesService {
     price: number,
     dateFrom: Date,
     dateTo: Date,
-    location: PlaceLocation
+    location: PlaceLocation,
+    image:string
   ) {
     let generatedId;
     const newPlace = new Place(
@@ -104,7 +108,8 @@ export class PlacesService {
       dateFrom,
       dateTo,
       this.authService.userId,
-      location
+      location,
+      image
     );
     return this.http
       .post<{ name: string }>(
@@ -162,7 +167,8 @@ export class PlacesService {
           oldPlaces.availableFromDate,
           oldPlaces.availableToDate,
           oldPlaces.userId,
-          oldPlaces.location
+          oldPlaces.location,
+          oldPlaces.image
         );
         return this.http.put(
           `https://ionic-angular-49c28-default-rtdb.firebaseio.com/offeredPlace/${id}.json`,
